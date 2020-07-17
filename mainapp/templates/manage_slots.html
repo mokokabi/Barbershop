@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+{% if success %}
+  <div class="alert alert-success" style="margin-top: 5%;">
+    <strong>{% trans "Success!" %}</strong> {% trans "Time Slots deleted successfully!" %}
+  </div>
+{% endif %}
+
+<div class="container">
+<br/>
+<form method="GET">
+  <div class="container text-center">
+    <div class="input-group mb-3">
+      <input type="text" name="search" class="form-control" value="{{search}}" placeholder="{% trans "Search for name of customers..." %}">
+      <div class="input-group-append">
+          <button class="btn btn-dark" type="submit">{% trans "Go" %}</button>
+      </div>
+    </div>
+  </div>
+</form>
+<br/>
+<form method="POST">
+  {% csrf_token %}
+<div class="row">
+  <div class="col-md-9">
+    {# <h2><i class="fa fa-calendar-alt"></i> Upcoming</h2> #}
+  {#  <p>The .table class adds basic styling (light padding and horizontal dividers) to a table:</p>#}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Select" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Time" %}</th>
+          <th>{% trans "Duration" %}</th>
+          <th>{% trans "Reserved" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for slot in slots %}
+        <tr>
+          <td>
+            {% if slot.reserved %}
+            <div class="form-check disabled text-center">
+                <input type="checkbox" class="form-check-input" value="" disabled>
+            </div>
+            {% else %}
+            <div class="form-check text-center ">
+                <input type="checkbox" class="form-check-input" name='slots' value="{{slot.id}}">
+            </div>
+            {% endif %}
+          </td>
+          <td> {{ slot.start_time.date }} </td>
+          <td> {{ slot.start_time.time }} </td>
+          <td> {{ slot.duration }} </td>
+          <td class="text-left">
+            {% if slot.reserved %}
+              {# <span class="fa fa-check"></span> #}
+              {{ slot.reservation.user.email }}
+            {% else %}
+              <span class="fa fa-times"></span>
+            {% endif %}
+           </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-3 ">
+    <div class="jumbotron">
+      <h6><strong>{% trans "Reserved" %}</strong>
+        <hr>
+        <ul class="list-group">
+          {% for _, option in filter.options.items %}
+            <a href="{{ option.url }}" class="list-group-item list-group-item-action {% if option.active %} bg-dark text-light {% endif %}">
+              <small>{{option.title}}</small>
+            </a>
+          {% endfor %}
+        </ul>
+    </h6>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-9 text-right">
+
+<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal">
+  <span class="fa fa-trash"></span> {% trans "Delete Selecteds" %}
+</button>
+
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">{% trans "Delete?" %}</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body text-left">
+        {% trans "Are you sure to delete these time slots?" %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-dark" >{% trans "Yes" %}</button>
+        <button type="button" class="btn " data-dismiss="modal">{% trans "No" %}</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<br>
+<br>
+  </div>
+  <div class="col-md-3">
+
+  </div>
+
+</div>
+</div>
+</form>
+
+{% endblock %}
